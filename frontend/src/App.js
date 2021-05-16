@@ -2,57 +2,35 @@ import React, { useState, useEffect, useRef } from "react";
 import socketIOClient from "socket.io-client";
 import {Line} from 'react-chartjs-2'
 import './App.css';
+import {Realtime} from './views/Realtime'
+import {Historical} from './views/Historical'
 
 function App() {  
-  const [chartData, setChartData] = useState({});
-
-  const Chart = () => {
-    let ecgData = new Array(100).fill({ x: 0, y:0 });
-    let ecgTime = new Array(100).fill(0);
-    const socket = socketIOClient('http://localhost:8080');
-    socket.on("FromAPI", socketData => {
-      ecgData.push(socketData)
-      ecgData.shift();
-
-      ecgTime.push(new Date().toISOString().substr(11, 8))
-      ecgTime.shift();
-
-      setChartData({
-        labels:  ecgTime,
-        datasets: [{
-          label: 'ECG Data',
-          data: ecgData,
-          pointRadius: 0, 
-          borderWidth: 2,
-          borderColor: "#000",
-        }]
-      });
-    });
-}
-useEffect(() => {
-  Chart();
-}, []);
   
+  const [currentPage, setCurrentPage] = useState('realtime');
+  const handlePageChange = (page) => {
+    if(page === 0){
+      setCurrentPage('realtime')
+    }else{
+      setCurrentPage('history')
+    }
+  }
   return (
     <div className="App">
-      <h1>Chart.js Realtime Data</h1>
-      <div>
-        <Line
-          data={chartData}
-          options={{
-            responsive:true,
-            title: { display: true },
-            animation: {
-              duration: 0
-            },
-            scales: {
-              yAxes: [{
-                  display: true,
-              }]
-          }
-          }}
-        />
-      </div>
+      <h1>Chart.js Data Representation</h1>
+      <button 
+        style={{width:'10%', color:'white', backgroundColor:'#00e', marginRight:'8%'}}
+        onClick={()=>handlePageChange(0)}
+        >
+          Realtime
+        </button>
+      <button 
+        style={{width:'10%', color:'white', backgroundColor:'green'}}
+        onClick={()=>handlePageChange(1)}
+        >
+          Historical
+        </button>
+        {currentPage === 'realtime' ? <Realtime/> : <Historical/>}
     </div>
   );
 }

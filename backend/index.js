@@ -3,9 +3,11 @@ const http = require("http");
 const socketIO = require("socket.io");
 const fs=require('fs');
 const bodyparser=require('body-parser');
+var cors = require('cors')
 
 const port = process.env.PORT || 8080;
 const app = express();
+app.use(cors())
 
 const server = http.createServer(app);
 
@@ -44,6 +46,11 @@ const getApiAndEmit = socket => {
     // Emitting a new message. Will be consumed by the client
     socket.emit("FromAPI", response);
 };
+
+app.get("/getData", (req, res, next) => {
+    console.log('istek geldi')
+    res.json(ecgdata);
+});
 
 server.listen(port, () =>{
   console.log(`BE is running at http://localhost:${port}`);
